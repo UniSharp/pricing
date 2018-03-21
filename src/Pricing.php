@@ -104,7 +104,7 @@ class Pricing
     protected function checkModule($module)
     {
         if (! in_array($module, $this->modules)) {
-            throw new InvalidModuleException('module not found in whitelist.');
+            throw new InvalidModuleException($module . ' not found in module list.');
         }
 
         $reflection = new \ReflectionClass($module);
