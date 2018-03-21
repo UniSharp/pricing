@@ -2,12 +2,13 @@
 
 namespace UniSharp\Pricing\Tests;
 
+use Closure;
 use Mockery as m;
 use UniSharp\Cart\CartItem;
 use UniSharp\Pricing\Pricing;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Container\Container;
+use UniSharp\Pricing\Tests\TestCase;
 use UniSharp\Cart\CartItemCollection;
 use UniSharp\Pricing\Tests\Fixtures\TestModule;
 use UniSharp\Pricing\Exceptions\InvalidModuleException;
@@ -73,11 +74,17 @@ class PricingTest extends TestCase
         $this->assertEquals($log, $pricing->getModuleLog(TestModule::class));
     }
 
+    public function testGetAppliedModules()
+    {
+        $pricing = $this->getPricing();
+        $pricing = $pricing->apply(TestModule::class);
+
+        $this->assertTrue(in_array(TestModule::class, $pricing->getAppliedModules()));
+    }
+
     public function testApply()
     {
-        $items = m::mock(CartItemCollection::class);
-
-        $pricing = $this->getPricing($items);
+        $pricing = $this->getPricing();
         $pricing = $pricing->apply(TestModule::class);
 
         $this->assertEquals(TestModule::DEDUCTION, $pricing->getDeduction(TestModule::class));
@@ -87,9 +94,7 @@ class PricingTest extends TestCase
 
     public function testModuleInfo()
     {
-        $items = m::mock(CartItemCollection::class);
-
-        $pricing = $this->getPricing($items);
+        $pricing = $this->getPricing();
         $pricing = $pricing->with([
             TestModule::class => $foo = 'bar'
         ]);
@@ -97,10 +102,29 @@ class PricingTest extends TestCase
         $this->assertEquals($foo, $pricing->getModuleInfo(TestModule::class));
     }
 
+    public function testExecute()
+    {
+        $module = m::mock(TestModule::class);
+
+        $module->shouldReceive('handle')
+            ->once()
+            ->with(m::type(Pricing::class), m::type(Closure::class))
+            ->andReturnSelf();
+
+        $module->shouldReceive('finish')
+            ->once()
+            ->with(m::type(Pricing::class))
+            ->andReturnSelf();
+
+        $pricing = $this->getPricing();
+        $pricing->apply(TestModule::class)->execute();
+    }
+
     protected function getPricing($items = null)
     {
-        $pipeline = new Pipeline(new Container);
-        $pricing = new Pricing($pipeline, $this->modules);
+        $container = new Container;
+        $pipeline = new Pipeline($container);
+        $pricing = new Pricing($container, $pipeline, $this->modules);
 
         if ($items) {
             $pricing = $pricing->setItems($items);

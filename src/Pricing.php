@@ -3,23 +3,28 @@
 namespace UniSharp\Pricing;
 
 use UniSharp\Cart\CartItem;
-use Illuminate\Pipeline\Pipeline;
+use Illuminate\Contracts\Pipeline\Pipeline;
+use Illuminate\Contracts\Container\Container;
 use UniSharp\Pricing\Tests\Fixtures\TestModule;
 use UniSharp\Cart\CartItemCollection as Collection;
 use UniSharp\Pricing\Exceptions\InvalidModuleException;
 
 class Pricing
 {
-    protected $items = null;
+    const MODULE_LEVEL = 2;
+
+    protected $items;
     protected $modules = [];
+    protected $container;
     protected $pipeline;
     protected $fees = [];
     protected $deductions = [];
     protected $infos = [];
     protected $logs = [];
 
-    public function __construct(Pipeline $pipeline, array $modules)
+    public function __construct(Container $container, Pipeline $pipeline, array $modules)
     {
+        $this->container = $container;
         $this->pipeline = $pipeline;
         $this->modules = $modules;
     }
@@ -57,6 +62,17 @@ class Pricing
             });
     }
 
+    public function execute()
+    {
+        foreach ($this->getAppliedModules() as $module) {
+            $this->container->call($module . '@finish', [
+                'pricing' => $this
+            ]);
+        }
+
+        return $this;
+    }
+
     public function with(array $params)
     {
         foreach ($params as $key => $value) {
@@ -78,6 +94,12 @@ class Pricing
     {
         if (! in_array($module, $this->modules)) {
             throw new InvalidModuleException('module not found in whitelist.');
+        }
+
+        $reflection = new \ReflectionClass($module);
+
+        if (! $reflection->implementsInterface(ModuleContract::class)) {
+            throw new InvalidModuleException($module . ' must implement ' . ModuleContract::class);
         }
     }
 
@@ -147,8 +169,16 @@ class Pricing
         return $this->logs[$module ?? $this->getCallerClass()] ?? null;
     }
 
+    public function getAppliedModules()
+    {
+        return array_unique(array_merge(
+            array_keys($this->fees),
+            array_keys($this->deductions)
+        ));
+    }
+
     protected function getCallerClass()
     {
-        return debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS)[2]['class'];
+        return debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS)[static::MODULE_LEVEL]['class'];
     }
 }
