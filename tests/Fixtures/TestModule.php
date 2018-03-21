@@ -9,11 +9,13 @@ class TestModule
 {
     const FEE = 99;
     const DEDUCTION = 88;
+    const LOG = 'log';
 
     public function handle($pricing, Closure $next)
     {
-        $pricing->addFee(99);
-        $pricing->addDeduction(99);
+        $pricing->addFee(static::FEE);
+        $pricing->addDeduction(static::DEDUCTION);
+        $pricing->writeModuleLog(static::LOG);
 
         return $next($pricing);
     }

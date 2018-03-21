@@ -4,7 +4,7 @@ namespace UniSharp\Pricing\Exceptions;
 
 use Exception;
 
-class InvalidCartItemException extends Exception
+class InvalidModuleException extends Exception
 {
     //
 }

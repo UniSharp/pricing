@@ -10,6 +10,7 @@ use Illuminate\Pipeline\Pipeline;
 use Illuminate\Container\Container;
 use UniSharp\Cart\CartItemCollection;
 use UniSharp\Pricing\Tests\Fixtures\TestModule;
+use UniSharp\Pricing\Exceptions\InvalidModuleException;
 
 class PricingTest extends TestCase
 {
@@ -40,14 +41,60 @@ class PricingTest extends TestCase
         $this->assertEquals($total, $pricing->getOriginalTotal());
     }
 
+    public function testInvalidModuleException()
+    {
+        $this->expectException(InvalidModuleException::class);
+
+        $pricing = $this->getPricing()->setModules([]);
+        $pricing->apply(TestModule::class);
+    }
+
+    public function testAddFee()
+    {
+        $pricing = $this->getPricing();
+        $pricing = $pricing->addFee($fee = 10, TestModule::class);
+
+        $this->assertEquals($fee, $pricing->getFee(TestModule::class));
+    }
+
+    public function testAddDeduction()
+    {
+        $pricing = $this->getPricing();
+        $pricing = $pricing->addDeduction($fee = 10, TestModule::class);
+
+        $this->assertEquals($fee, $pricing->getDeduction(TestModule::class));
+    }
+
+    public function testWriteModuleLog()
+    {
+        $pricing = $this->getPricing();
+        $pricing = $pricing->writeModuleLog($log = 'log', TestModule::class);
+
+        $this->assertEquals($log, $pricing->getModuleLog(TestModule::class));
+    }
+
     public function testApply()
     {
         $items = m::mock(CartItemCollection::class);
 
         $pricing = $this->getPricing($items);
-        $pricing->apply(TestModule::class);
+        $pricing = $pricing->apply(TestModule::class);
 
-        // assertion
+        $this->assertEquals(TestModule::DEDUCTION, $pricing->getDeduction(TestModule::class));
+        $this->assertEquals(TestModule::FEE, $pricing->getFee(TestModule::class));
+        $this->assertEquals(TestModule::LOG, $pricing->getModuleLog(TestModule::class));
+    }
+
+    public function testModuleInfo()
+    {
+        $items = m::mock(CartItemCollection::class);
+
+        $pricing = $this->getPricing($items);
+        $pricing = $pricing->with([
+            TestModule::class => $foo = 'bar'
+        ]);
+
+        $this->assertEquals($foo, $pricing->getModuleInfo(TestModule::class));
     }
 
     protected function getPricing($items = null)
@@ -62,18 +109,18 @@ class PricingTest extends TestCase
         return $pricing;
     }
 
-    protected function getItems($number = 1)
-    {
-        $collection = new CartItemCollection([]);
+    // protected function getItems($number = 1)
+    // {
+    //     $collection = new CartItemCollection([]);
 
-        for ($i = 0; $i < $number; $i++) {
-            $collection->push(new CartItem([
-                'id' => uniqid(),
-                'price' => random_int(1, 100),
-                'quantity' => random_int(1, 5)
-            ]));
-        }
+    //     for ($i = 0; $i < $number; $i++) {
+    //         $collection->push(new CartItem([
+    //             'id' => uniqid(),
+    //             'price' => random_int(1, 100),
+    //             'quantity' => random_int(1, 5)
+    //         ]));
+    //     }
 
-        return $collection;
-    }
+    //     return $collection;
+    // }
 }
