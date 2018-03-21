@@ -2,10 +2,8 @@
 
 namespace UniSharp\Pricing;
 
-use UniSharp\Cart\CartItem;
 use Illuminate\Contracts\Pipeline\Pipeline;
 use Illuminate\Contracts\Container\Container;
-use UniSharp\Pricing\Tests\Fixtures\TestModule;
 use UniSharp\Cart\CartItemCollection as Collection;
 use UniSharp\Pricing\Exceptions\InvalidModuleException;
 
