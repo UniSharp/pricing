@@ -46,6 +46,17 @@ class Pricing
         return $this->items->sum('price');
     }
 
+    public function getTotal()
+    {
+        $total = $this->getOriginalTotal();
+        $fees = array_sum($this->getFees());
+        $deductions = array_sum($this->getDeductions());
+
+        $result = $total - $deductions + $fees;
+
+        return $result > 0 ? $result : 0;
+    }
+
     public function apply($module, $params = null)
     {
         $this->checkModule($module);

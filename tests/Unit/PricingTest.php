@@ -82,6 +82,21 @@ class PricingTest extends TestCase
         $this->assertTrue(in_array(TestModule::class, $pricing->getAppliedModules()));
     }
 
+    public function testGetTotal()
+    {
+        $items = m::mock(CartItemCollection::class);
+        $items->shouldReceive('sum')
+            ->with('price')
+            ->andReturn($total = 100);
+
+        $pricing = $this->getPricing($items);
+        $pricing = $pricing->apply(TestModule::class);
+
+        $result = $total - TestModule::DEDUCTION + TestModule::FEE;
+
+        $this->assertEquals($result, $pricing->getTotal());
+    }
+
     public function testApply()
     {
         $pricing = $this->getPricing();
