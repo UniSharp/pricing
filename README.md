@@ -28,7 +28,7 @@ return [
 
 * Module must implement `UniSharp\Pricing\ModuleContract` which needs `handle` and `finish` functions.
 * Modules will be processed by the sequence in `config/pricing.php`, the first module will handle the pricing logic and pass pricing instance to the next module (Pipeline Pattern).
-* There are three APIs a pricing module can call in the handle function:
+* There are some APIs a pricing module can call in the handle function:
     * $pricing->addFee(int $fee);
     * $pricing->addDeduction(int $deduction);
     * $pricing->writeModuleLog(mix $log);
