@@ -6,7 +6,7 @@ use Closure;
 use UniSharp\Pricing\Pricing;
 use UniSharp\Pricing\ModuleContract;
 
-class TestModule implements ModuleContract
+class TestModule2 implements ModuleContract
 {
     const FEE = 99;
     const DEDUCTION = 88;

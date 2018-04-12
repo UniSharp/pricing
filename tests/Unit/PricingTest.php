@@ -11,12 +11,14 @@ use Illuminate\Container\Container;
 use UniSharp\Pricing\Tests\TestCase;
 use UniSharp\Cart\CartItemCollection;
 use UniSharp\Pricing\Tests\Fixtures\TestModule;
+use UniSharp\Pricing\Tests\Fixtures\TestModule2;
 use UniSharp\Pricing\Exceptions\InvalidModuleException;
 
 class PricingTest extends TestCase
 {
     protected $modules = [
-        TestModule::class
+        TestModule::class,
+        TestModule2::class
     ];
 
     public function testSetItems()
@@ -48,6 +50,15 @@ class PricingTest extends TestCase
 
         $pricing = $this->getPricing()->setModules([]);
         $pricing->apply(TestModule::class);
+    }
+
+    public function testInvalidModuleSequenceException()
+    {
+        $this->expectException(InvalidModuleException::class);
+
+        $pricing = $this->getPricing()
+            ->apply(TestModule2::class)
+            ->apply(TestModule::class);
     }
 
     public function testAddFee()

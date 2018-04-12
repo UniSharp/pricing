@@ -110,6 +110,12 @@ class Pricing
         if (! $reflection->implementsInterface(ModuleContract::class)) {
             throw new InvalidModuleException($module . ' must implement ' . ModuleContract::class);
         }
+
+        foreach ($this->getAppliedModules() as $appliedModule) {
+            if (array_search($module, $this->modules) < array_search($appliedModule, $this->modules)) {
+                throw new InvalidModuleException($module . ' can not apply after ' . $appliedModule);
+            }
+        }
     }
 
     public function setModules(array $modules)
