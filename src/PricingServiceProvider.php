@@ -29,8 +29,7 @@ class PricingServiceProvider extends ServiceProvider
         $this->app->singleton('pricing', function ($app) {
             return new Pricing(
                 $app,
-                new Pipeline($app),
-                $app['config']['pricing.modules']
+                new Pipeline($app)
             );
         });
     }
