@@ -20,10 +20,11 @@ class Pricing
     protected $infos = [];
     protected $logs = [];
 
-    public function __construct(Container $container, Pipeline $pipeline)
+    public function __construct(Container $container, Pipeline $pipeline, array $modules)
     {
         $this->container = $container;
         $this->pipeline = $pipeline;
+        $this->modules = $modules;
     }
 
     public function setItems(Collection $items)
@@ -100,11 +101,27 @@ class Pricing
 
     protected function checkModule($module)
     {
+        if (! in_array($module, $this->modules)) {
+            throw new InvalidModuleException($module . ' not found in module list.');
+        }
+
         $reflection = new \ReflectionClass($module);
 
         if (! $reflection->implementsInterface(ModuleContract::class)) {
             throw new InvalidModuleException($module . ' must implement ' . ModuleContract::class);
         }
+    }
+
+    public function setModules(array $modules)
+    {
+        $this->modules = $modules;
+
+        return $this;
+    }
+
+    public function getModules()
+    {
+        return $this->modules;
     }
 
     public function addFee($value, $moduleName = null)

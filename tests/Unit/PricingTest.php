@@ -15,6 +15,10 @@ use UniSharp\Pricing\Exceptions\InvalidModuleException;
 
 class PricingTest extends TestCase
 {
+    protected $modules = [
+        TestModule::class
+    ];
+
     public function testSetItems()
     {
         $items = m::mock(CartItemCollection::class);
@@ -36,6 +40,14 @@ class PricingTest extends TestCase
         $pricing->getOriginalTotal();
 
         $this->assertEquals($total, $pricing->getOriginalTotal());
+    }
+
+    public function testInvalidModuleException()
+    {
+        $this->expectException(InvalidModuleException::class);
+
+        $pricing = $this->getPricing()->setModules([]);
+        $pricing->apply(TestModule::class);
     }
 
     public function testAddFee()
@@ -127,7 +139,7 @@ class PricingTest extends TestCase
     {
         $container = new Container;
         $pipeline = new Pipeline($container);
-        $pricing = new Pricing($container, $pipeline);
+        $pricing = new Pricing($container, $pipeline, $this->modules);
 
         if ($items) {
             $pricing = $pricing->setItems($items);
