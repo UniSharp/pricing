@@ -41,7 +41,9 @@ class Pricing
 
     public function getOriginalTotal()
     {
-        return $this->items->sum('price');
+        return $this->items->sum(function ($item) {
+            return $item->price * $item->quantity;
+        });
     }
 
     public function getTotal()
