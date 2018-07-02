@@ -35,11 +35,10 @@ class PricingTest extends TestCase
     {
         $items = m::mock(CartItemCollection::class);
         $items->shouldReceive('sum')
-            ->with('price')
+            ->with(m::type('callable'))
             ->andReturn($total = 10);
 
         $pricing = $this->getPricing($items);
-        $pricing->getOriginalTotal();
 
         $this->assertEquals($total, $pricing->getOriginalTotal());
     }
@@ -97,7 +96,7 @@ class PricingTest extends TestCase
     {
         $items = m::mock(CartItemCollection::class);
         $items->shouldReceive('sum')
-            ->with('price')
+            ->with(m::type('callable'))
             ->andReturn($total = 100);
 
         $pricing = $this->getPricing($items);
