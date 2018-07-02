@@ -1,5 +1,12 @@
 # Pricing
 
+[![Latest Version on Packagist][ico-version]][link-packagist]
+[![Software License][ico-license]](LICENSE.md)
+[![Build Status][ico-travis]][link-travis]
+[![Coverage Status][ico-scrutinizer]][link-scrutinizer]
+[![Quality Score][ico-code-quality]][link-code-quality]
+[![Total Downloads][ico-downloads]][link-downloads]
+
 A modularized pricing package for buyalbe.
 
 ## Installation
@@ -121,3 +128,18 @@ class Foo {
     Pricing::getItems();
 }
 ```
+
+[ico-version]: https://img.shields.io/packagist/v/UniSharp/pricing.svg?style=flat-square
+[ico-license]: https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square
+[ico-travis]: https://img.shields.io/travis/UniSharp/pricing/master.svg?style=flat-square
+[ico-scrutinizer]: https://img.shields.io/scrutinizer/coverage/g/UniSharp/pricing.svg?style=flat-square
+[ico-code-quality]: https://img.shields.io/scrutinizer/g/UniSharp/pricing.svg?style=flat-square
+[ico-downloads]: https://img.shields.io/packagist/dt/UniSharp/pricing.svg?style=flat-square
+
+[link-packagist]: https://packagist.org/packages/unisharp/pricing
+[link-travis]: https://travis-ci.org/UniSharp/pricing
+[link-scrutinizer]: https://scrutinizer-ci.com/g/UniSharp/pricing/code-structure
+[link-code-quality]: https://scrutinizer-ci.com/g/UniSharp/pricing
+[link-downloads]: https://packagist.org/packages/UniSharp/pricing
+[link-author]: https://github.com/UniSharp
+[link-contributors]: ../../contributors
